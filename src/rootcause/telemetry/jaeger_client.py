@@ -1,6 +1,7 @@
 
 import os
 import requests
+from datetime import datetime, timedelta, timezone
 
 JAEGER_BASE_URL = os.getenv(
     "JAEGER_BASE_URL",
@@ -19,10 +20,54 @@ def get_services():
     return data.get("services", [])
 
 
+def get_traces(service_name, minutes=15):
+    """
+    Retrieve recent traces containing a given service.
+
+    Args:
+        service_name: Microservice to search.
+        minutes: Lookback window in minutes.
+
+    Returns:
+        JSON response from Jaeger.
+    """
+
+    url = f"{JAEGER_BASE_URL}/api/v3/traces"
+
+    end_time = datetime.now(timezone.utc)
+    start_time = end_time - timedelta(minutes=minutes)
+
+    params = {
+        "query.serviceName": service_name,
+        "query.startTimeMin": start_time.isoformat(),
+        "query.startTimeMax": end_time.isoformat(),
+    }
+
+    response = requests.get(
+        url,
+        params=params,
+        timeout=20,
+    )
+
+    print("Request URL:", response.url)
+    print("HTTP Status:", response.status_code)
+
+    response.raise_for_status()
+
+    return response.json()
+
+
 if __name__ == "__main__":
     services = get_services()
+    print("Available services:", len(services))
 
-    print(f"Total services: {len(services)}")
+    traces = get_traces("checkout")
 
-    for service in services:
-        print(f"- {service}")
+    print("\nResponse type:", type(traces))
+
+    if isinstance(traces, dict):
+        print("Top-level keys:", list(traces.keys()))
+
+    print("\nResponse preview:")
+    print(str(traces)[:1500])
+
