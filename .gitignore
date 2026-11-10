@@ -1,0 +1,46 @@
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# IDE and OS
+.DS_Store
+.vscode/
+.idea/
+
+# Telemetry data
+data/raw/
+data/processed/
+
+# Logs
+*.log
+logs/
+
+# Experiment artifacts
+mlruns/
+artifacts/
+checkpoints/
+
+# Node.js
+node_modules/
+dist/
+build/
+.next/
+
+# Local infrastructure
+*.tfstate
+*.tfstate.*
+.terraform/
