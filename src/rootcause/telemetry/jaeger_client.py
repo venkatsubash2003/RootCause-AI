@@ -2,6 +2,8 @@
 import os
 import requests
 from datetime import datetime, timedelta, timezone
+from trace_normalizer import normalize_traces
+from save_spans import save_records
 
 JAEGER_BASE_URL = os.getenv(
     "JAEGER_BASE_URL",
@@ -62,12 +64,14 @@ if __name__ == "__main__":
     print("Available services:", len(services))
 
     traces = get_traces("checkout")
+    records = normalize_traces(traces)
 
-    print("\nResponse type:", type(traces))
+    save_records(records,"../../../data/processed/checkout_spans.csv")
 
-    if isinstance(traces, dict):
-        print("Top-level keys:", list(traces.keys()))
+    
 
-    print("\nResponse preview:")
-    print(str(traces)[:1500])
+    print(f"Total spans: {len(records)}")
+
+    for record in records[:5]:
+        print(record)
 
