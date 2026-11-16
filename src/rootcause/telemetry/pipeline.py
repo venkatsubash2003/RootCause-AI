@@ -5,7 +5,7 @@ from pathlib import Path
 
 from jaeger_client import get_traces
 from trace_normalizer import normalize_traces
-
+from datetime import datetime, timezone
 
 
 def collect_telemetry(service_name):
@@ -43,11 +43,17 @@ def run_pipeline(service_name):
     raw_dir = output_dir / "raw"
     processed_dir = output_dir / "processed"
 
+    batch_id = datetime.now(
+    timezone.utc
+    ).strftime("%Y%m%d_%H%M%S_%f")
+
     raw_dir.mkdir(parents=True, exist_ok=True)
     processed_dir.mkdir(parents=True, exist_ok=True)
 
     # Preserve the original API response
-    raw_file = raw_dir / f"{service_name}_traces.json"
+    raw_file = raw_dir / (
+    f"{service_name}_{batch_id}.json"
+    )
 
     with raw_file.open("w") as file:
         json.dump(raw_traces, file, indent=2)
@@ -60,8 +66,8 @@ def run_pipeline(service_name):
             "No spans were returned for normalization"
         )
 
-    csv_file = (
-        processed_dir / f"{service_name}_spans.csv"
+    csv_file = processed_dir / (
+    f"{service_name}_{batch_id}.csv"
     )
 
     with csv_file.open("w", newline="") as file:
@@ -79,4 +85,4 @@ def run_pipeline(service_name):
 
 
 if __name__ == "__main__":
-    run_pipeline("checkout")
+    run_pipeline("ad")
