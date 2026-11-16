@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 
 def extract_attributes(attributes):
     """
@@ -62,6 +63,12 @@ def normalize_traces(payload):
         ):
 
             for span in scope.get("spans", []):
+                start_ns = int(span["startTimeUnixNano"])
+
+                started_at = datetime.fromtimestamp(
+                    start_ns / 1_000_000_000,
+                    tz=timezone.utc
+                ).isoformat()
 
                 start = int(
                     span.get("startTimeUnixNano", 0)
@@ -89,6 +96,7 @@ def normalize_traces(payload):
                     "operation": span.get("name"),
                     "duration_ms": duration_ms,
                     "status": status.get("code", 0),
+                    "started_at_utc": started_at,
                 })
 
     return records
