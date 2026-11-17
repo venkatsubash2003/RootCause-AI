@@ -1,7 +1,7 @@
 
 import pandas as pd
 
-CSV_PATH = "data/processed/checkout_spans.csv"
+CSV_PATH = "data/processed/ad_spans.csv"
 
 df = pd.read_csv(CSV_PATH)
 

@@ -70,3 +70,76 @@ class LatencyAnomalyDetector:
                 anomaly_score > self.threshold
             )
         }
+
+
+    def train_detector(healthy_df):
+        split_index = int(len(healthy_df) * 0.7)
+
+        train_df = healthy_df.iloc[:split_index]
+        test_df = healthy_df.iloc[split_index:]
+
+        if len(train_df) < 20 or len(test_df) < 5:
+            raise ValueError(
+                "Need at least 20 training samples "
+                "and 5 held-out healthy samples"
+            )
+
+        model = LatencyAnomalyDetector(
+            threshold=3.5,
+            min_samples=20
+        )
+
+        model.fit(
+            train_df["duration_ms"].to_numpy()
+        )
+
+        print("\nHealthy baseline learned")
+        print("------------------------")
+        print("Training samples:", len(train_df))
+        print("Healthy test samples:", len(test_df))
+        print("Baseline median:", model.median)
+        print("Baseline scale:", model.scale)
+
+        return model, test_df
+    
+def evaluate(model, df, dataset_name):
+    results = df.copy()
+
+    predictions = [
+        model.predict(duration)
+        for duration in results["duration_ms"]
+    ]
+
+    results["anomaly_score"] = [
+        p["anomaly_score"] for p in predictions
+    ]
+
+    results["is_anomaly"] = [
+        p["is_anomaly"] for p in predictions
+    ]
+
+    total = len(results)
+    anomalies = int(results["is_anomaly"].sum())
+    anomaly_rate = anomalies / total if total else 0
+
+    print(f"\nDataset: {dataset_name}")
+    print("-" * 35)
+    print("Total observations:", total)
+    print("Detected anomalies:", anomalies)
+    print(f"Anomaly rate: {anomaly_rate:.2%}")
+    print(
+        "Median latency:",
+        round(results["duration_ms"].median(), 2),
+        "ms"
+    )
+    print(
+        "p95 latency:",
+        round(
+            results["duration_ms"].quantile(0.95),
+            2
+        ),
+        "ms"
+    )
+
+    return results
+
