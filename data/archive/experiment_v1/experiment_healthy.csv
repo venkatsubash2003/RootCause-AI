@@ -1,1 +1,0 @@
-trace_id,span_id,parent_span_id,service,operation,duration_ms,status,started_at_utc

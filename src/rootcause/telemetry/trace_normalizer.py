@@ -29,7 +29,6 @@ attributes = [
     }
 ]
 
-print(extract_attributes(attributes))
 
 
 
@@ -100,3 +99,6 @@ def normalize_traces(payload):
                 })
 
     return records
+
+if __name__ == "__main__":
+    print(extract_attributes(attributes))

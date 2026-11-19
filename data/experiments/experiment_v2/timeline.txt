@@ -1,4 +1,0 @@
-healthy_start=2026-11-18T19:03:35Z
-fault_start=2026-11-18T19:04:05Z
-recovery_start=2026-11-18T19:04:26Z
-recovery_end=2026-11-18T19:04:40Z
